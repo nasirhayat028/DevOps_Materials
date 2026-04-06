@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rolling-update-deployment
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: rolling-update
+  template:
+    metadata:
+      labels:
+        app: rolling-update
+    spec:
+      containers: # Changed from 'container' to 'containers'
+      - name: rolling-update-container
+        image: nasirhayat028/resume:latest
+        ports:
+        - containerPort: 5173

@@ -1,0 +1,573 @@
+
+
+
+Commadns that i use in my practice
+
+kubectl get pods
+
+kubectl run nginx --image nginx
+
+kubectl describe pod newpods-sl9z2 (image see which image use this pods)
+
+kubectl get pods -o wide
+
+kubectl delete pod webapp
+
+kubectl run redis --image redis123
+ 
+kubectl set image pod redis redis=redis:latest (IMAGE UPDATE UNDER POD)
+kubectl set image pod/redis redis=redis (IMAGE UPDATE UNDER POD)
+
+---
+
+in yml file using replicas ansd self healing.
+
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: my-resume
+spec:
+  replicas: 3
+  selector:
+    app: resume-app  # The controller looks for this label
+  template:
+    metadata:
+      labels:
+        app: resume-app  # The Pod is tagged with this label
+    spec:
+      containers:
+      - name: text-resume
+        image: nasirhayat028/resume
+        ports:
+        - containerPort: 5173
+        
+kubectl apply -f replicases.yml
+kubectl delete replicationcontroller my-resume
+kubectl get replicationcontroller
+
+kubectl get pods
+kubectl get replicasets
+kubectl get deployment
+
+
+ kubectl get svc
+kubectl get deployments
+kubectl create -f service.yml 
+kubectl get deployments
+kubectl get replicases
+kubectl get replicasets
+kubectl get deployments
+kubectl get pods
+kubectl get services
+
+
+kubectl get services
+kubectl describe service kubernetes
+kubectl describe service
+kubectl get deployments.apps 
+kubectl describe deployment simple-webapp-deployment 
+kubectl create -f service-definition-1.yaml 
+
+
+kubectl get namespaces 
+kubectl get pods
+kubectl get pods --namespace=research
+kubectl run redis --image=redis --namespace=finance
+kubectl get pods --all-namespaces
+
+
+imparative and declarative
+
+kubectl api-resources
+kubectl explain pods
+kubectl explain pods.spec  
+
+
+kubectl replace --force -f nginx.yaml
+
+kubectl get pods --selector app=App1
+kubectl get all --selector env=prod,bu=finance,tier=frontend
+
+
+taints & toleration
+kubectl taint nodes node01 spray=mortein:NoSchedule
+kubectl describe node node1
+kubectl get nodes
+kubectl describe node node01
+kubectl run mosquito --image nginx
+kubectl get pods
+
+➜  cat bee.yml 
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: bee
+spec:
+  containers:
+  - image: nginx
+    name: bee
+  tolerations:
+  - key: spray
+    value: mortein
+    effect: NoSchedule
+    operator: Equal
+
+=> kubectl create -f bee.yml 
+pod/bee created
+
+controlplane ~ ➜  kubectl get pods
+NAME       READY   STATUS    RESTARTS   AGE
+bee        1/1     Running   0          16s
+mosquito   0/1     Pending   0          5m35s
+
+
+kubectl get pod bee -o wide
+kubectl describe pod bee
+kubectl describe node controlplane | grep -i taints
+
+kubectl taint --help
+
+kubectl taint nodes controlplane node-role.kubernetes.io/control-plane:NoSchedule-
+
+
+kubectl get nodes
+kubectl describe node node01 
+kubectl label node node01 color=blue
+kubectl describe node node01 
+kubectl create deployment blue --image nginx --replicas=3
+kubectl get deployments.apps 
+kubectl get pods
+kubectl describe node controlplane | grep -i taints
+kubectl describe node node01 | grep -i taints
+
+kubectl get nodes --show-labels
+kubectl edit deployment blue
+kubectl get pods -o wide
+
+
+RECOURCES..
+kubectl describe pod rabbit
+ kubectl delete pod rabbit 
+kubectl describe pod elephant 
+kubectl get po elephant -o yaml > elephant.yaml
+ls
+vi elephant.yaml 
+cat elephant.yaml 
+kubectl replace -f elephant.yaml --force
+
+PRIORITY CLASSES
+
+kubectl get PriorityClasses
+kubectl get priorityclass high-priority
+vi high-priority
+
+apiVersion: scheduling.k8s.io/v1
+kind: PriorityClass
+metadata:
+  name: high-priority
+value: 100000
+globalDefault: false
+description: "This priority class is used for high-priority pods."
+preemptionPolicy: PreemptLowerPriority
+
+kubectl apply -f high-priority 
+kubectl get PriorityClasses
+
+vi low-priorit
+
+apiVersion: scheduling.k8s.io/v1
+kind: PriorityClass
+metadata:
+  name: low-priority
+value: 1000
+globalDefault: false
+description: "This priority class is used for low-priority pods."
+
+
+kubectl apply -f low-priorit 
+kubectl get PriorityClasses
+
+
+
+  
+vi low-prio-pod
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: low-prio-pod
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+  priorityClassName: low-priority
+
+cat low-prio-pod 
+
+kubectl apply -f low-prio-pod
+
+
+
+cat high-priority
+
+# high-prio-pod.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: high-prio-pod
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+  priorityClassName: high-priority
+
+kubectl apply -f high-priority
+
+
+kubectl get pods -o custom-columns="NAME:.metadata.name,PRIORITY:.spec.priorityClassName"
+
+
+kubectl describe pod critical-app
+
+
+kubectl get pod critical-app -o yaml > critical-app.yaml
+# critical-app.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  ...
+  name: critical-app
+  ...
+spec:
+  containers:
+  - image: nginx
+    imagePullPolicy: Always
+    name: critical-container
+    ...
+  dnsPolicy: ClusterFirst
+  priorityClassName: high-priority   # Add the high-priority class
+  enableServiceLinks: true
+  preemptionPolicy: PreemptLowerPriority
+  priority: 0  # Remove this line as this is the old default priority
+  ...
+
+kubectl delete pod critical-app
+kubectl apply -f critical-app.yaml
+kubectl get pod critical-app
+
+
+MONITRING AND LOGGINIG
+
+controlplane ~ ➜  history
+kubectl get pods
+kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+kubectl get deployment metrics-server -n kube-system
+kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+cd kubernetes...
+kubectl create -f .
+kubectl top node
+kubectl top pod
+kubectl top pod --sort-by='memory' --no-headers | head -1 
+
+
+kubectl get pods
+kubectl logs webapp-1
+kubectl logs -f webapp-1
+
+kubectl logs -f webapp-2 simple-webapp (in this .yml file it have two containers one name is simple-webapp and another simple-webapp-db)
+
+
+
+ROLLING UPDATES
+
+kubectl rollout status deployment/nginx
+kubectl rollout history deployment/nginx
+
+kubectl rollout undo deployment/nginx (Go back to lower version)
+
+
+
+
+k get pods
+k get deploy
+
+./curl-test.sh 
+bash /root/curl-test.sh
+
+k get deployments.apps 
+k describe deploy frontend 
+
+kubectl set image deploy frontend simple-webapp=kodekloud/webapp-color:v2
+./curl-test.sh 
+kubectl describe deploy frontend 
+k edit deploy frontend
+k set image deploy frontend simple-webapp=kodekloud/webapp-color:v3
+./curl-test.sh 
+
+
+kubectl port-forward deployment/rolling-update-deployment 5173:80
+
+
+k get configmap
+k describe cm configmap <name> (cm is short form of configmap)
+
+
+
+
+
+configmap
+k get pods
+k describe pod webapp-color 
+ k edit pod webapp-color 
+ cat /tmp/kubectl-edit-1814844844.yaml
+k replace --force -f /tmp/kubectl-edit-1814844844.yaml
+k get configmap
+k describe configmaps db-config 
+kubectl create configmap  webapp-config-map --from-literal=APP_COLOR=darkblue --from-literal=APP_OTHER=disregard
+k get configmaps 
+k edit pod webapp-color 
+k replace --force -f /tmp/kubectl-edit-1814844844.yaml
+k edit pod webapp-color 
+
+
+DB SECRET
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: webapp-pod
+  labels:
+    name: webapp-pod
+  namespace: default
+spec:
+  containers:
+  - name: webapp
+    image: kodekloud/simple-webapp-mysql
+    imagePullPolicy: Always
+    envFrom:
+    - secretRef:
+        name: db-secret
+
+kubectl get secrets
+kubectl describe secret dashboard-token
+kubectl create secret generic db-secret --from-literal=DB_Host=sql01 --from-literal=DB_User=root --from-literal=DB_Password=password123
+kubectl get secret
+kubectl get pods
+kubectl edit pod webapp-pod 
+kubectl apply -f webapp-pod.yaml
+kubectl get pod webapp-pod -o yaml > webapp-pod.yaml
+kubectl get pods
+
+vi webapp-pod.yaml 
+kubectl create -f webapp-pod.yaml 
+kubectl delete pod webapp-pod 
+kubectl apply -f webapp-pod.yaml
+
+echo -n "password" | base64
+
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+multi container
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: yellow
+spec:
+  containers:
+  - name: lemon
+    image: busybox
+    command:
+      - sleep
+      - "1000"
+
+  - name: gold
+    image: redis
+
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+The app pod in the elastic-stack namespace currently writes logs to /log/app.log.
+Your task is to add a sidecar container that will ship these logs to Elasticsearch.
+
+Requirements:
+
+Add a sidecar container named sidecar to the existing app pod.
+Use the image: kodekloud/filebeat-configured.
+Mount the log volume: The existing log-volume must be mounted to the sidecar container at /var/log/event-simulator/.
+Implementation: Define the sidecar as a Kubernetes native sidecar container using initContainers, and set the restartPolicy to Always.
+
+Important Notes:
+
+You will need to delete and re-create the pod to add the sidecar container.
+Do not modify the existing app container or volume configuration.
+The sidecar should be defined as an initContainer and must run continuously alongside the main application container
+Refer to the diagram below for your configuration.
+Reference Documentation:
+
+Sidecar Containers: https://kubernetes.io/docs/concepts/workloads/pods/sidecar-containers/
+Note: State persistence concepts are discussed in detail later in this course. For now, follow the pattern shown in the reference documentation.
+
+_______________
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    name: app
+  name: app
+  namespace: elastic-stack
+spec:
+  initContainers:
+  - name: sidecar
+    image: kodekloud/filebeat-configured
+    restartPolicy: Always
+    volumeMounts:
+      - name: log-volume
+        mountPath: /var/log/event-simulator
+
+  containers:
+  - image: kodekloud/event-simulator
+    name: app
+    resources: {}
+    volumeMounts:
+    - mountPath: /log
+      name: log-volume
+
+  volumes:
+  - hostPath:
+      path: /var/log/webapp
+      type: DirectoryOrCreate
+    name: log-volume
+_______________
+
+1. Multi-Container Pods (Kya hote hain?)
+Jab aik hi Pod ke andar aik se zyada containers chal rahe hon, to usay Multi-container Pod kehte hain. Ye containers hamesha aik saath start hote hain, aik saath move hote hain, aur aik hi network (IP address) share karte hain.
+Kyun use hote hain? Jab do processes ka aapas mein itna gehra talluq ho ke wo aik dusre ke baghair kaam na kar saken (maslan: aik app aur uska log collector).
+2. Init Containers (Kyun, Kaha aur Kaise?)
+Kya hote hain?
+Init containers wo containers hote hain jo "Main Application Container" ke chalne se pehle apna kaam khatam karte hain. 
+Rule: Init container ka apna kaam poora karke exit hona zaroori hai. Agar ye fail ho gaya, to main container kabhi start nahi hoga. [1, 3] 
+Kyun use karte hain? (Use Cases)
+Setup/Preparation: Main app ke liye koi file download karni ho ya directory banani ho. [1]
+Dependency Check: Ye check karna ke Database ready hai ya nahi. Jab tak DB ready nahi hoga, Init container wait karega aur app start nahi hone dega. [1, 2]
+Security: Kuch sensitive kaam jo aap main container mein nahi dikhana chahte, wo init container mein karke khatam kar den. [2] 
+Kaise use karte hain? (YAML Example)
+Iska tarika ye hai ke aap YAML file mein spec ke andar initContainers ka section add karte hain. 
+yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: myapp-pod
+spec:
+  # Ye pehle chalega
+  initContainers:
+  - name: install-tools
+    image: busybox
+    command: ['sh', '-c', 'echo "Tools Installing..." && sleep 5']
+
+  # Ye tab chalega jab upar wala finish ho jaye
+  containers:
+  - name: main-app
+    image: nginx
+Use code with caution.
+
+3. Mashoor Patterns (Helper Containers)
+Multi-container pods mein 3 main patterns use hote hain:
+Sidecar: Main app ke sath reh kar uski madad karna (maslan: Logs fetch karna). [3, 4]
+Adapter: Main app ke output ko kisi khaas format mein badalna taake bahar ka system samajh sake. [3, 4]
+Ambassador: Network proxy ke taur par kaam karna (maslan: App ko bataye baghair traffic ko kisi khaas DB tak pohnchana). [3, 4] 
+Khulasa (Summary):
+Init Containers: Pehle aate hain, kaam khatam karke chale jate hain. [1, 2]
+Main Containers: Baad mein aate hain aur jab tak app chal rahi hai, tab tak rehte hain. [1] 
+
+
+1. Init Containers (The "Pre-Setup" Specialist) 
+Ye containers main application se pehle chalte hain. Inka maqsad mahool (environment) ko tayyar karna hota hai. 
+Kubernetes
+Kubernetes
+ +1
+Rule: Agar Init container fail ho jaye, to main app start nahi hogi.
+Example (Database Wait): Farz karein aapki app tabhi chal sakti hai jab Database online ho.
+yaml
+initContainers:
+- name: wait-for-db
+  image: busybox
+  # Ye command tab tak check karegi jab tak DB service mil na jaye
+  command: ['sh', '-c', 'until nslookup db-service; do echo waiting for db; sleep 2; done']
+Use code with caution.
+
+ 
+Medium
+Medium
+ +2
+2. Multi-Container Patterns (The Helpers) 
+Jab main app chal rahi ho, to uske sath "Helper" containers bhi hote hain jo alag-alag kaam karte hain. In ke teen mashoor types hain: 
+YouTube
+YouTube
+ +2
+A. Sidecar Pattern (The Enhancer) 
+Ye main container ki taqat barhata hai, maslan logs ikatha karna. 
+YouTube
+YouTube
+ +2
+Example: Ek container mein Nginx (web server) chal raha hai aur dusre (Sidecar) mein Log Agent jo Nginx ke logs ko read karke kisi central server par bhej raha hai.
+Fayda: Aapko main app ke code mein log shipping ka code nahi likhna parta. 
+DEV Community
+DEV Community
+ +1
+B. Adapter Pattern (The Translator)
+Ye main container ke output ko "Standard" format mein badalta hai taake monitoring systems (jaise Prometheus) usay samajh saken. 
+Medium
+Medium
+ +1
+Example: Aapki purani app logs ko "Text" format mein deti hai, lekin aapko "JSON" chahiye. Adapter container us text ko JSON mein convert kar deta hai.
+Fayda: Purani apps ko naye monitoring systems ke sath connect karna asan ho jata hai. 
+Medium
+Medium
+ +1
+C. Ambassador Pattern (The Proxy) 
+Ye container main app ke liye "Gatekeeper" ya "Proxy" ka kaam karta hai. 
+Kubernetes
+Kubernetes
+ +1
+Example: App ko lagta hai ke wo localhost:6379 par Redis se baat kar rahi hai, lekin asal mein Ambassador us request ko pakar kar cloud mein mojud kisi door ke Redis cluster tak bhej deta hai.
+Fayda: App ko complex network settings ya IP addresses yaad rakhne ki zaroorat nahi rehti. 
+Summary Table
+Pattern 	Kab Use Karein?	Asal Misal (Real Example)
+Init	App chalne se pehle kuch download ya check karna ho	DB connection check karna ya config files download karna
+Sidecar	App ke sath sath extra kaam (logs/metrics) karna ho	Fluentd ya Filebeat logs collection ke liye
+Adapter	Output ka format tabdeel karna ho	Metrics ko Prometheus format mein convert karna
+Ambassador	Network communication ko asan banana ho	Service Mesh (jaise Istio/Consul) ka proxy
+
+________________  
+
+Scaling
+Horizantal Pod AutoScaling (HPA)
+kubectl scale 
+deployment flask-web-app --replicas=3
+
+_______________
+
+kubectl autoscale deployment nginx-deployment --max=3 --cpu=80%
+kubectl apply -f /root/autoscale.yml
+
+
+vpa
+_______________
+kubectl get deployments -n kube-system | grep vpa
+kubectl apply -f flask-app.yml 
+kubectl get deployments.apps 
+kubectl logs flask-app-84d5df7d4c-q6vkb 
+k get pods
+k get deployments.apps 
+kubectl logs $(kubectl get pods -n kube-system --no-headers -o custom-columns=":metadata.name" | grep vpa-updater) -n kube-system
+kubectl get pods -n kube-system
+k logs vpa-admission
+kubectl logs $(kubectl get pods -n kube-system --no-headers -o custom-columns=":metadata.name" | grep vpa-updater) -n kube-system
+kubectl scale deployment flask-app --replicas=2
+kubectl get deployment flask-app -o wide
+kubectl get pods -l app=flask-app
+
+_______________
+

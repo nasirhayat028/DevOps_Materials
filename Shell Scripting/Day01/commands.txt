@@ -1,0 +1,14 @@
+mkdir Day01
+  cd Day01/
+  ls
+  vim hello.txt
+  cat hello.txt
+  cat hello.sh
+  which bash
+  vim hello.sh
+  ls -l
+  chmod 745 hello.sh
+  ls -l
+ ./hello.sh 
+  history
+

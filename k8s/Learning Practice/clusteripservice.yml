@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: resume-deployment
+spec:
+  selector:
+    matchLabels:
+      app: nasir-resume
+  replicas: 2 # Specifies that two pod replicas should run
+  template:
+    metadata:
+      labels:
+        app: nasir-resume # Labels used by the Deployment selector and Service selector
+    spec:
+      containers:
+      - name: nasir-resume
+        image: nasirhayat028/resume:latest # Uses a specific resume image
+        ports:
+        - containerPort: 5173 # The port the container listens on
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: resume-service
+spec:
+  selector:
+    app: nasir-resume # Selects Pods with the label "app: nasir-resume"
+  type: ClusterIP # Default type, exposes the Service on a cluster-internal IP
+  ports:
+    - protocol: TCP
+      port: 80 # The port the Service itself exposes
+      targetPort: 80 # The port on the Pods to forward traffic to

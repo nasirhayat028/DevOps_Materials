@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  namespace: school-ms
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: school-ms-backend
+  template:
+    metadata:
+      labels:
+        app: school-ms-backend
+    spec:
+      containers:
+      - name: backend
+        image: nasirhayat028/schoolms:backend
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+          - containerPort: 5000
+
+        env:
+          - name: DB_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: school-ms-secret
+                key: DB_USERNAME
+
+          - name: DB_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: school-ms-secret
+                key: DB_PASSWORD
+
+          - name: MONGO_URI
+            valueFrom:
+              secretKeyRef:
+                name: school-ms-secret
+                key: MONGO_URI
+
+          - name: BACKEND_PORT
+            valueFrom:
+              configMapKeyRef:
+                name: school-ms-config
+                key: BACKEND_PORT
+

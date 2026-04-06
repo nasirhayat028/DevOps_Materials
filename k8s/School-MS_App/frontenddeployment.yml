@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  namespace: school-ms
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: school-ms-frontend
+
+  template:
+
+    metadata:
+      labels:
+        app: school-ms-frontend
+
+    spec:
+      containers:
+      - name: frontend
+        image: nasirhayat028/schoolms:frontend
+
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+
+        ports:
+          - containerPort: 80
+
+        env:
+          - name: API_URL
+            valueFrom:
+              configMapKeyRef:
+                name: school-ms-config
+                key: API_URL
+
+          - name: FRONTEND_PORT
+            valueFrom: 
+              configMapKeyRef:
+                name: school-ms-config
+                key: FRONTEND_PORT

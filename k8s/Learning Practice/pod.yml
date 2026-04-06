@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: my-resume
+spec:
+  containers:
+  - name: text-resume
+    image: nasirhayat028/resume
+    ports:
+    - containerPort: 5173

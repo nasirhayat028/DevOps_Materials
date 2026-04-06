@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: resume-deployment
+  labels:
+    app: nasir-resume
+spec:
+  replicas: 2 # Runs two pods
+  selector:
+    matchLabels:
+      app: nasir-resume
+  template:
+    metadata:
+      labels:
+        app: nasir-resume # Pods created by the Deployment will have this label
+    spec:
+      containers:
+      - name: nasir-resume
+        image: nasirhayat028/resume:latest # Specifies the container image to use
+        ports:
+        - containerPort: 80 # The port the container exposes
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: resume-service
+spec:
+  selector:
+    app: nasir-resume # Selects pods with the label "app: nasir-resume"
+  ports:
+  - protocol: TCP
+    port: 5173 # The port exposed by the Service (internal cluster port)
+    targetPort: 5173 # The port on the container to forward traffic to
+  type: NodePort # Exposes the Service externally via a cloud provider's NordPort
