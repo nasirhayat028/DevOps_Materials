@@ -114,6 +114,9 @@ ReplicaSet:
 
 ## 📦 ReplicaSet YAML
 
+### 📦 ReplicaSet YAML
+
+```yaml
 apiVersion: apps/v1
 kind: ReplicaSet
 metadata:
@@ -131,6 +134,7 @@ spec:
       containers:
       - name: nginx
         image: nginx
+```
 
 ```
 spec:
@@ -142,9 +146,10 @@ spec:
 ---
 
 ## 🔍 Selector Deep Dive
-
+```
 matchLabels:
-app: web
+    app: web
+```
 
 👉 ye match karega pods jinke labels same hain
 
@@ -168,6 +173,7 @@ kubectl apply -f rs.yaml
 Check:
 
 kubectl get replicasets
+
 kubectl get pods
 
 ---
