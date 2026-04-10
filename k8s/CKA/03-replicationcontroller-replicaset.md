@@ -117,19 +117,20 @@ ReplicaSet:
 apiVersion: apps/v1
 kind: ReplicaSet
 metadata:
-name: my-app-rs
-
+  name: my-app-rs
 spec:
-replicas: 3
-
-selector:
-matchLabels:
-app: web
-
-template:
-metadata:
-labels:
-app: web
+  replicas: 3
+  selector:
+    matchLabels:
+      app: web
+  template:
+    metadata:
+      labels:
+        app: web
+    spec:
+      containers:
+      - name: nginx
+        image: nginx
 
 ```
 spec:
