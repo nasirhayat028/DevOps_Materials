@@ -999,20 +999,5 @@ kubectl logs -f pod-name
 
 ---
 
-# 🚀 FINAL MINDSET
 
-Kubernetes = Desired State Engine
-
-You define → Kubernetes maintains
-
----
-
-# 🚀 NEXT STEP
-
-Ask for:
-
-* Deployment YAML deep dive
-* Service YAML deep dive
-
-We go production level next 🔥
     
