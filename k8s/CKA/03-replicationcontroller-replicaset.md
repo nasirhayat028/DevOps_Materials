@@ -32,6 +32,28 @@ ReplicationController = ensure karta hai ke
 
 ---
 
+### Example YAML
+
+```yaml
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: my-app
+spec:
+  replicas: 3
+  selector:
+    app: web
+  template:
+    metadata:
+      labels:
+        app: web
+    spec:
+      containers:
+      - name: nginx
+        image: nginx
+```
+
+
 ## ⚙️ Example YAML
 ```
 apiVersion: v1
