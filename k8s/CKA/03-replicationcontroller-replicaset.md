@@ -33,7 +33,7 @@ ReplicationController = ensure karta hai ke
 ---
 
 ## ⚙️ Example YAML
-
+```
 apiVersion: v1
 kind: ReplicationController
 metadata:
@@ -48,6 +48,7 @@ template:
 metadata:
 labels:
 app: web
+```
 
 ```
 spec:
